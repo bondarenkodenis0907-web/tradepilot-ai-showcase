@@ -1,41 +1,72 @@
 # Architecture
 
+TradePilot AI is split into the web application, database layer, external integrations and a separate research worker.
+
 ```mermaid
 flowchart TD
-    U[User] --> W[Next.js Web App]
-    W --> API[Application API Layer]
+    U[User] --> WEB[Next.js Application]
+
+    WEB --> API[Application API]
     API --> AUTH[Supabase Auth]
-    API --> DB[(Supabase PostgreSQL)]
+    API --> DB[(PostgreSQL)]
     DB --> RLS[Row Level Security]
 
-    API --> MARKET[Market / Exchange APIs]
-    API --> TG[Telegram Integration]
+    API --> MARKET[Bybit / Market APIs]
+    API --> TG[Telegram]
 
-    DB --> RW[Research Worker]
-    RW --> EVAL[Strategy Evaluation]
-    EVAL --> DB
+    DB --> WORKER[Research Worker]
+    WORKER --> RESEARCH[Strategy Evaluation]
+    RESEARCH --> DB
 
-    CI[GitHub Actions CI] --> TESTS[Application + SQL Tests]
-    TESTS --> W
+    CI[GitHub Actions] --> TESTS[Application + SQL Tests]
+    TESTS --> WEB
     TESTS --> DB
 ```
 
-## Main components
+## Web Application
 
-### Web application
-Next.js + TypeScript UI for portfolio overview, journal, strategy scenarios and settings.
+The Next.js application provides the portfolio view, journal, strategy scenarios, research status and system health screens.
 
-### API layer
-Typed application endpoints for market data, strategy evaluation, journal workflows and integrations.
+User-facing requests go through the application API rather than giving the browser direct access to privileged integrations.
 
-### Supabase
-Authentication, PostgreSQL persistence, migrations and Row Level Security.
+## Database
 
-### Research worker
-Background research and diagnostics used to evaluate strategy hypotheses and store evidence.
+Supabase PostgreSQL stores application state, journal data, strategy configuration and research evidence.
 
-### External integrations
-Read-only market/exchange data and Telegram notifications.
+Row Level Security is used for owner-scoped data.
 
-### CI
-Automated checks for application logic, database behavior and security boundaries.
+Database changes are managed through migrations and tested separately from the frontend.
+
+## Exchange Integration
+
+The application reads account, execution and market data from Bybit.
+
+Exchange access used by the research system is read-only. Research code does not have trade execution authority.
+
+## Research Worker
+
+Research and diagnostics run outside the normal web request lifecycle.
+
+The worker reads the required historical data, evaluates registered research tasks and writes evidence back to PostgreSQL.
+
+Research results do not automatically become active trading behavior.
+
+## Telegram
+
+Telegram is used for application notifications.
+
+Telegram credentials are not exposed to the browser.
+
+## CI
+
+GitHub Actions checks application code and database behavior independently.
+
+The test suite includes TypeScript/application checks and SQL-level security tests.
+
+## System Boundaries
+
+- browser code does not receive exchange private credentials
+- user-owned database rows are protected by RLS
+- research workers are separated from trade execution
+- experimental results are stored independently from active application state
+- production secrets are not included in this public showcase
