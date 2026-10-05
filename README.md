@@ -1,22 +1,25 @@
-
 # TradePilot AI — Technical Showcase
 
-TradePilot AI is a private trading research and analytics platform built with Next.js, TypeScript, Supabase/PostgreSQL and automated research tooling.
+TradePilot AI is a private trading research and analytics platform built with Next.js, TypeScript, Supabase/PostgreSQL and a separate research worker.
 
-This repository is a public technical showcase. The production source code remains private.
+The production repository is private. This repository contains only architecture notes, security/testing information and screenshots from the real application.
 
-> Note: the current production UI is in Russian. The screenshots below show the real application as it exists today. An English UI locale is planned.
+> The current production UI is in Russian. The screenshots below are from the actual application.
 
-## What the system does
+## System Overview
 
-- Authenticates users with Supabase Auth
-- Isolates user data with Row Level Security
-- Reads portfolio and execution data from Bybit in read-only mode
-- Maintains a trade journal and strategy evaluation workflow
-- Runs automated research and diagnostic jobs
-- Integrates Telegram notifications
-- Stores and processes market and strategy data in PostgreSQL
-- Uses CI and automated tests for application, database and security checks
+The platform combines several parts of the workflow in one application:
+
+- portfolio and account data
+- trade journal
+- market data
+- strategy scenarios
+- research jobs
+- research evidence
+- system health
+- Telegram notifications
+
+Exchange integration is read-only. Research code does not have permission to place trades.
 
 ## Screenshots
 
@@ -32,106 +35,101 @@ This repository is a public technical showcase. The production source code remai
 
 ![System Overview](overview.jpg)
 
-## Engineering Highlights
-
-### Next.js + TypeScript
-
-The web application uses a typed application layer with separate UI, API and domain logic.
-
-### Supabase + PostgreSQL
-
-Supabase provides authentication, PostgreSQL storage and Row Level Security.
-
-Database migrations and SQL tests are part of the development workflow.
-
-### API Integrations
-
-The platform integrates external market data and trading account data while keeping exchange access read-only.
-
-### Research Workers
-
-Background research tooling evaluates strategy hypotheses and produces reproducible evidence rather than directly placing trades.
-
-### Security
-
-The project includes:
-
-- Row Level Security checks
-- Request guards and rate limits
-- Controlled public configuration
-- Encrypted Telegram credentials
-- Read-only exchange access
-- API and identity boundary tests
-- Separation between research logic and trade execution
-
-### CI and Testing
-
-The private production repository includes GitHub Actions plus application-level and SQL-level tests covering:
-
-- Authentication and identity
-- Row Level Security isolation
-- API boundaries
-- Database migrations
-- Strategy evaluation
-- Research workflows
-- Signal outcomes
-- Security hardening
-- Data freshness
-- System health
-
 ## Architecture
 
-See [ARCHITECTURE.md](ARCHITECTURE.md).
+```text
+User
+  ↓
+Next.js application
+  ↓
+Application API
+  ├── Supabase Auth
+  ├── PostgreSQL
+  │     └── Row Level Security
+  ├── Market / exchange APIs
+  └── Telegram
+          ↓
+     Research worker
+          ↓
+   Strategy evaluation
+          ↓
+   Research evidence
+```
+
+A more detailed diagram is available in [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Key Engineering Decisions
+
+### Read-only exchange access
+
+Exchange integrations are intentionally read-only.
+
+The research system can inspect account, execution and market data, but research logic is kept separate from trade execution.
+
+### Database-level authorization
+
+User-owned data is protected with PostgreSQL Row Level Security.
+
+Authorization is enforced in the database rather than relying only on frontend or API filtering.
+
+### Research isolation
+
+Experimental research results are stored separately from live application state.
+
+A research result does not automatically change active strategy behavior.
+
+### Reproducible research
+
+Strategy ideas are evaluated using defined datasets, execution assumptions and test criteria before they are considered for promotion.
+
+Negative results are kept as research evidence instead of being silently discarded.
+
+### Separate background worker
+
+Long-running research and diagnostic work is handled outside the web request lifecycle.
+
+The web application is responsible for user interaction and application APIs, while the worker handles research tasks.
 
 ## Security and Testing
 
-See [SECURITY_AND_TESTING.md](SECURITY_AND_TESTING.md).
+The private production repository includes application-level and SQL-level tests covering areas such as:
+
+- authentication and identity
+- Row Level Security
+- API boundaries
+- database migrations
+- research workflows
+- strategy evaluation
+- signal outcomes
+- data freshness
+- system health
+
+Additional notes are available in [SECURITY_AND_TESTING.md](SECURITY_AND_TESTING.md).
 
 ## Tech Stack
 
 - Next.js
-- TypeScript
 - React
+- TypeScript
 - Supabase
 - PostgreSQL
 - Row Level Security
-- REST / API integrations
+- REST APIs
+- Bybit integration
 - Telegram Bot API
 - GitHub Actions
 - Python research worker
 - SQL and application-level tests
 
-## Project Status
+## Public Repository Scope
 
-The platform is under active development and is used as a private research and analytics system.
+This showcase does not include:
 
-The public showcase intentionally excludes:
+- API keys
+- exchange credentials
+- private trading data
+- production database contents
+- proprietary strategy implementation
+- private production source code
 
-- API keys and credentials
-- Private trading data
-- Exchange credentials
-- Proprietary strategy implementation details
-- Production database contents
-- Private production source code
-
-## Role
-
-Independent full-stack project.
-
-Main focus areas:
-
-- Architecture
-- Supabase / PostgreSQL
-- Authentication and RLS
-- API integrations
-- Background research workflows
-- Testing and CI
-- Troubleshooting
-- Security
-
-## Key Engineering Decisions
-
-- Exchange integrations are read-only. Research and trade execution are intentionally separated.
-- PostgreSQL Row Level Security is used as a database-level authorization boundary.
-- Research workers store experimental results separately from live application state.
-- Strategy changes are evaluated before promotion rather than modifying live behavior directly.
+The purpose of this repository is to show the architecture and engineering approach without publishing sensitive project internals.
