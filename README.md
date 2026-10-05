@@ -129,8 +129,9 @@ Main focus areas:
 - Troubleshooting
 - Security
 
-## Why This Project Matters
+## Key Engineering Decisions
 
-TradePilot AI is designed as a real working system rather than a static demo.
-
-The project combines frontend development, backend APIs, authentication, PostgreSQL, security controls, external integrations, automated research and continuous testing in one application.
+- Exchange integrations are read-only. Research and trade execution are intentionally separated.
+- PostgreSQL Row Level Security is used as a database-level authorization boundary.
+- Research workers store experimental results separately from live application state.
+- Strategy changes are evaluated before promotion rather than modifying live behavior directly.
