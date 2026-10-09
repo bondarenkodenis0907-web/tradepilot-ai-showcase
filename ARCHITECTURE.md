@@ -1,72 +1,46 @@
 # Architecture
 
-TradePilot AI is split into the web application, database layer, external integrations and a separate research worker.
+TradePilot has a web interface, Supabase backend and a separate research worker. Notifications and exchange access are backend integrations; they are not steps through which every research request passes.
 
 ```mermaid
 flowchart TD
-    U[User] --> WEB[Next.js Application]
-
-    WEB --> API[Application API]
-    API --> AUTH[Supabase Auth]
-    API --> DB[(PostgreSQL)]
-    DB --> RLS[Row Level Security]
-
-    API --> MARKET[Bybit / Market APIs]
-    API --> TG[Telegram]
-
-    DB --> WORKER[Research Worker]
-    WORKER --> RESEARCH[Strategy Evaluation]
-    RESEARCH --> DB
-
-    CI[GitHub Actions] --> TESTS[Application + SQL Tests]
-    TESTS --> WEB
-    TESTS --> DB
+    B[Browser: React and TypeScript] --> A[Supabase Auth]
+    B --> D[Owner-scoped database reads]
+    D --> P[(PostgreSQL with RLS)]
+    B --> API[Application API]
+    API --> P
+    API --> I[Backend integrations]
+    E[Supabase Edge Functions] --> P
+    E --> I
+    I --> BY[Bybit: read-only data]
+    I --> TG[Telegram notifications]
+    W[Node.js / Python research worker] --> P
 ```
 
-## Web Application
+The diagram shows responsibilities, not every endpoint or scheduled job.
 
-The Next.js application provides the portfolio view, journal, strategy scenarios, research status and system health screens.
+## Web and backend
 
-User-facing requests go through the application API rather than giving the browser direct access to privileged integrations.
+The React/TypeScript interface uses Next.js-style routes with Vinext/Vite. It displays journal records, market observations, research status and system health.
 
-## Database
+Authenticated browser code can read owner-scoped Supabase data under RLS. Operations involving private integration credentials run through backend code. Supabase Edge Functions handle scheduled integration work separately from page requests.
 
-Supabase PostgreSQL stores application state, journal data, strategy configuration and research evidence.
+PostgreSQL stores account-related records, journal data, strategy configuration and research evidence. Migrations and SQL tests are versioned in the private repository.
 
-Row Level Security is used for owner-scoped data.
+## Research worker
 
-Database changes are managed through migrations and tested separately from the frontend.
+The research worker is separate from the web-serving runtime. Node.js handles worker orchestration and Python implements offline calculations. Jobs and results are tracked independently of the page lifecycle.
 
-## Exchange Integration
+A result is evidence for review. It does not automatically activate a strategy or grant trading permissions. Defined dataset boundaries and execution assumptions are part of an evaluation, including when the result is negative.
 
-The application reads account, execution and market data from Bybit.
+## Example: health checks during refresh
 
-Exchange access used by the research system is read-only. Research code does not have trade execution authority.
+A watchlist refresh can start several market requests while the dashboard also asks for system health. Unbounded refresh traffic and duplicate diagnostic work can compete for database time.
 
-## Research Worker
+Market refresh concurrency is limited to four. The health request retries a statement timeout once after a short delay; it does not retry an authentication failure or indefinitely repeat a failing request. The interface reports a persistent timeout rather than treating missing health data as a successful check.
 
-Research and diagnostics run outside the normal web request lifecycle.
+## Runtime and deployment
 
-The worker reads the required historical data, evaluates registered research tasks and writes evidence back to PostgreSQL.
+The private repository builds the web application and a Cloudflare worker bundle. The research worker is a different program, not that web-serving worker.
 
-Research results do not automatically become active trading behavior.
-
-## Telegram
-
-Telegram is used for application notifications.
-
-Telegram credentials are not exposed to the browser.
-
-## CI
-
-GitHub Actions checks application code and database behavior independently.
-
-The test suite includes TypeScript/application checks and SQL-level security tests.
-
-## System Boundaries
-
-- browser code does not receive exchange private credentials
-- user-owned database rows are protected by RLS
-- research workers are separated from trade execution
-- experimental results are stored independently from active application state
-- production secrets are not included in this public showcase
+Build checks and a successful GitHub merge are separate from publishing the hosted application. A repository update alone does not establish which revision is live.

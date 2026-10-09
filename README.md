@@ -1,135 +1,47 @@
-# TradePilot AI — Technical Showcase
+# TradePilot AI
 
-TradePilot AI is a private trading research and analytics platform built with Next.js, TypeScript, Supabase/PostgreSQL and a separate research worker.
+TradePilot helps review exchange activity and test trading ideas. It brings account data, a trade journal, market observations and research results into one application.
 
-The production repository is private. This repository contains only architecture notes, security/testing information and screenshots from the real application.
+The source repository is private. This showcase contains screenshots and a description of the implementation; it cannot be used to build or run the application. The screenshots show the Russian-language interface.
 
-> The current production UI is in Russian. The screenshots below are from the actual application.
+## What the application does
 
-## System Overview
+Users can review imported Bybit data, inspect journal entries, record a trade review and configure strategy scenarios. Background tasks refresh data and run research separately from the web interface. Telegram provides notifications.
 
-The platform combines several parts of the workflow in one application:
-
-- portfolio and account data
-- trade journal
-- market data
-- strategy scenarios
-- research jobs
-- research evidence
-- system health
-- Telegram notifications
-
-Exchange integration is read-only. Research code does not have permission to place trades.
+The exchange connection is read-only. Research output does not authorize an order or activate a strategy.
 
 ## Screenshots
 
-### Trade Journal
+### Trade journal
 
-![Trade Journal](journal.jpg)
+![Trade journal](journal.jpg)
 
-### Strategy Scenarios
+### Strategy scenarios
 
-![Strategy Scenarios](scenarios.jpg)
+![Strategy scenarios](scenarios.jpg)
 
-### System Overview
+### Overview
 
-![System Overview](overview.jpg)
+![Overview](overview.jpg)
 
-## Architecture
+## Decisions behind the implementation
 
-```text
-User
-  ↓
-Next.js application
-  ↓
-Application API
-  ├── Supabase Auth
-  ├── PostgreSQL
-  │     └── Row Level Security
-  ├── Market / exchange APIs
-  └── Telegram
-          ↓
-     Research worker
-          ↓
-   Strategy evaluation
-          ↓
-   Research evidence
-```
+**Keep ownership checks in the database.** User-owned records have PostgreSQL Row Level Security policies. A browser filter is useful for the interface, but it cannot be the access boundary. SQL tests exercise access with different user identities.
 
-A more detailed diagram is available in [ARCHITECTURE.md](ARCHITECTURE.md).
+**Separate research from web requests.** Research jobs use a separate Node.js/Python worker. This keeps longer calculations out of the page request and gives them their own job and result records.
 
-## Key Engineering Decisions
+**Keep failed ideas in the research history.** An evaluation uses defined data and execution assumptions. Negative results are retained; a disappointing result does not justify changing the rule and presenting the rerun as an independent test.
 
-### Read-only exchange access
+**Handle temporary failures without hiding persistent ones.** Market refreshes have a concurrency limit. The health check retries a database timeout once, while authentication errors and repeated failures remain visible. These behaviors have regression tests.
 
-Exchange integrations are intentionally read-only.
+## Technology and boundaries
 
-The research system can inspect account, execution and market data, but research logic is kept separate from trade execution.
+The web layer uses React, TypeScript and Next.js-style routing through Vinext/Vite. Supabase provides authentication, PostgreSQL and Edge Functions. Bybit supplies exchange data; Telegram handles notifications; a separate research worker runs Node.js/Python jobs.
 
-### Database-level authorization
+[Architecture and data flow](ARCHITECTURE.md) · [Security boundaries and checks](SECURITY_AND_TESTING.md)
 
-User-owned data is protected with PostgreSQL Row Level Security.
+## What this showcase can demonstrate
 
-Authorization is enforced in the database rather than relying only on frontend or API filtering.
+The screenshots show the interface, and the notes explain how responsibilities are divided. Automated checks run in the private repository, so visitors cannot reproduce them from this showcase. Screenshots also do not establish strategy profitability or prove that every production scenario has been tested.
 
-### Research isolation
-
-Experimental research results are stored separately from live application state.
-
-A research result does not automatically change active strategy behavior.
-
-### Reproducible research
-
-Strategy ideas are evaluated using defined datasets, execution assumptions and test criteria before they are considered for promotion.
-
-Negative results are kept as research evidence instead of being silently discarded.
-
-### Separate background worker
-
-Long-running research and diagnostic work is handled outside the web request lifecycle.
-
-The web application is responsible for user interaction and application APIs, while the worker handles research tasks.
-
-## Security and Testing
-
-The private production repository includes application-level and SQL-level tests covering areas such as:
-
-- authentication and identity
-- Row Level Security
-- API boundaries
-- database migrations
-- research workflows
-- strategy evaluation
-- signal outcomes
-- data freshness
-- system health
-
-Additional notes are available in [SECURITY_AND_TESTING.md](SECURITY_AND_TESTING.md).
-
-## Tech Stack
-
-- Next.js
-- React
-- TypeScript
-- Supabase
-- PostgreSQL
-- Row Level Security
-- REST APIs
-- Bybit integration
-- Telegram Bot API
-- GitHub Actions
-- Python research worker
-- SQL and application-level tests
-
-## Public Repository Scope
-
-This showcase does not include:
-
-- API keys
-- exchange credentials
-- private trading data
-- production database contents
-- proprietary strategy implementation
-- private production source code
-
-The purpose of this repository is to show the architecture and engineering approach without publishing sensitive project internals.
+The public repository contains no source implementation, production credentials or account datasets.
