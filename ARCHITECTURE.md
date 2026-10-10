@@ -1,6 +1,6 @@
 # Architecture
 
-TradePilot has a web interface, Supabase backend and a separate research worker. Notifications and exchange access are backend integrations; they are not steps through which every research request passes.
+TradePilot has a web interface, Supabase backend and a separate research worker. Backend integrations provide exchange data and notifications.
 
 ```mermaid
 flowchart TD
@@ -17,8 +17,6 @@ flowchart TD
     W[Node.js / Python research worker] --> P
 ```
 
-The diagram shows responsibilities, not every endpoint or scheduled job.
-
 ## Web and backend
 
 The React/TypeScript interface uses Next.js-style routes with Vinext/Vite. It displays journal records, market observations, research status and system health.
@@ -31,7 +29,7 @@ PostgreSQL stores account-related records, journal data, strategy configuration 
 
 The research worker is separate from the web-serving runtime. Node.js handles worker orchestration and Python implements offline calculations. Jobs and results are tracked independently of the page lifecycle.
 
-A result is evidence for review. It does not automatically activate a strategy or grant trading permissions. Defined dataset boundaries and execution assumptions are part of an evaluation, including when the result is negative.
+Research results require review and do not automatically activate a strategy or grant trading permissions. Each evaluation records its dataset boundaries and execution assumptions, including when the result is negative.
 
 ## Example: health checks during refresh
 
@@ -41,6 +39,4 @@ Market refresh concurrency is limited to four. The health request retries a stat
 
 ## Runtime and deployment
 
-The private repository builds the web application and a Cloudflare worker bundle. The research worker is a different program, not that web-serving worker.
-
-Build checks and a successful GitHub merge are separate from publishing the hosted application. A repository update alone does not establish which revision is live.
+The private repository builds the web application and a Cloudflare worker bundle. The Node.js/Python research worker is deployed separately from the Cloudflare web worker.
