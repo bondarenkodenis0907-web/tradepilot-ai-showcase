@@ -12,17 +12,25 @@ The exchange connection is read-only. Research output does not authorize an orde
 
 ## Screenshots
 
-### Trade journal
-
-![Trade journal](journal.jpg)
+These mobile captures were taken on 3 October 2026. They document that interface revision and are not live account views.
 
 ### Strategy scenarios
 
-![Strategy scenarios](scenarios.jpg)
+A user selects a strategy, market and direction to inspect its conditions. Scenario checks do not place trades.
 
-### Overview
+<img src="scenarios.jpg" width="390" alt="TradePilot strategy-scenario screen, captured 3 October 2026" />
 
-![Overview](overview.jpg)
+### Trade journal
+
+The journal shows imported trading activity and opens individual trade reviews. Figures visible in this historical capture are not independently verified performance results.
+
+<img src="journal.jpg" width="390" alt="TradePilot trade journal, historical capture from 3 October 2026" />
+
+### Overview and system health
+
+The overview capture includes a limited-operation warning. It records the state displayed at capture time, not a current system-health check.
+
+<img src="overview.jpg" width="390" alt="TradePilot overview with a limited-operation warning, captured 3 October 2026" />
 
 ## Implementation
 
@@ -36,4 +44,4 @@ The web layer uses React, TypeScript and Next.js-style routing through Vinext/Vi
 
 [Architecture and data flow](ARCHITECTURE.md) · [Security boundaries and checks](SECURITY_AND_TESTING.md)
 
-The public repository contains no credentials or account datasets. Research results are not a claim of profitable trading.
+The public repository contains no integration credentials or exported account datasets. Research results are not a claim of profitable trading.
