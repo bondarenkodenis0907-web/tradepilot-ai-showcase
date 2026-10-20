@@ -18,7 +18,7 @@ Desktop captures from the running application, taken on 20 October 2026 with the
 
 A watchlist shows closed-candle prices, EMA, RSI, ATR and volume relative to its average. Each card identifies its timeframe and scanner state.
 
-<img src="https://github.com/user-attachments/assets/35259e79-d2f2-4495-be5b-46f326faf1f0" width="960" alt="TradePilot market watchlist and indicators in English, captured 20 October 2026" />
+<img src="https://github.com/user-attachments/assets/ebb1bb8a-2e06-4795-8f96-fbfce1825424" width="960" alt="TradePilot market watchlist and indicators in English, captured 20 October 2026" />
 
 ### Strategy scenarios
 
@@ -30,7 +30,7 @@ A user selects a strategy, symbol and direction to inspect conditions and scenar
 
 The form accepts a planned entry, stop, target and risk percentage for a context and risk check. The balance field is blank in this capture. No calculation was submitted to create this screenshot.
 
-<img src="https://github.com/user-attachments/assets/7cc1a82c-e52f-48df-9763-ddc996d6c98e" width="960" alt="TradePilot manual entry plan in English with the balance field blank, captured 20 October 2026" />
+<img src="https://github.com/user-attachments/assets/3c92d4c5-8e20-42bc-bafa-c099f609da35" width="960" alt="TradePilot manual entry plan in English with the balance field blank, captured 20 October 2026" />
 
 ## Implementation
 
