@@ -2,7 +2,7 @@
 
 TradePilot helps review exchange activity and test trading ideas. It brings account data, a trade journal, market observations and research results into one application.
 
-The source repository is private. This public showcase contains screenshots of the Russian-language interface and implementation notes; it has no runnable application or test suite.
+The source repository is private. This public showcase contains screenshots of the English interface and implementation notes; it has no runnable application or test suite.
 
 ## What the application does
 
@@ -12,25 +12,25 @@ The exchange connection is read-only. Research output does not authorize an orde
 
 ## Screenshots
 
-These mobile captures were taken on 3 October 2026. They document that interface revision and are not live account views.
+Desktop captures from the running application, taken on 20 October 2026 with the interface set to English. Saved strategy names can retain their original language. These images document the interface at capture time; they are not live market data or evidence of trading performance.
+
+### Market and indicators
+
+A watchlist shows closed-candle prices, EMA, RSI, ATR and volume relative to its average. Each card identifies its timeframe and scanner state.
+
+<img src="https://github.com/user-attachments/assets/35259e79-d2f2-4495-be5b-46f326faf1f0" width="960" alt="TradePilot market watchlist and indicators in English, captured 20 October 2026" />
 
 ### Strategy scenarios
 
-A user selects a strategy, market and direction to inspect its conditions. Scenario checks do not place trades.
+A user selects a strategy, symbol and direction to inspect conditions and scenario history. Shadow evaluations record subsequent price observations, not executed trades or profit. Scenario checks do not place orders.
 
-<img src="scenarios.jpg" width="390" alt="TradePilot strategy-scenario screen, captured 3 October 2026" />
+<img src="https://github.com/user-attachments/assets/7bf42482-1e9f-48af-a402-98c3a9787f55" width="960" alt="TradePilot scenario checks in the English interface, captured 20 October 2026" />
 
-### Trade journal
+### Manual entry plan
 
-The journal shows imported trading activity and opens individual trade reviews. Figures visible in this historical capture are not independently verified performance results.
+The form accepts a planned entry, stop, target and risk percentage for a context and risk check. The balance field is blank in this capture. No calculation was submitted to create this screenshot.
 
-<img src="journal.jpg" width="390" alt="TradePilot trade journal, historical capture from 3 October 2026" />
-
-### Overview and system health
-
-The overview capture includes a limited-operation warning. It records the state displayed at capture time, not a current system-health check.
-
-<img src="overview.jpg" width="390" alt="TradePilot overview with a limited-operation warning, captured 3 October 2026" />
+<img src="https://github.com/user-attachments/assets/7cc1a82c-e52f-48df-9763-ddc996d6c98e" width="960" alt="TradePilot manual entry plan in English with the balance field blank, captured 20 October 2026" />
 
 ## Implementation
 
